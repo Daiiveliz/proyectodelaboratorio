@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Indumentaria Pro | Presentación</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap');
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden}
+body{
+  font-family:'Montserrat',sans-serif;
+  background:#0b0b0d;
+  color:#fff;
+}
+:root{
+  --bg:#0b0b0d;
+  --card:#151519;
+  --soft:#202026;
+  --accent:#d7ff4f;
+  --muted:#aaaab4;
+  --white:#fff;
+}
+
+.presentation{height:100vh;width:100vw;position:relative}
+.slide{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  padding:6vh 8vw;
+  opacity:0;visibility:hidden;
+  transform:translateX(45px) scale(.985);
+  transition:opacity .55s ease,transform .55s ease,visibility .55s;
+  background:
+    radial-gradient(circle at 85% 15%,rgba(215,255,79,.09),transparent 28%),
+    radial-gradient(circle at 10% 90%,rgba(255,255,255,.035),transparent 30%),
+    var(--bg);
+}
+.slide.active{opacity:1;visibility:visible;transform:none}
+.content{width:min(1180px,100%);max-height:88vh}
+.eyebrow{
+  color:var(--accent);font-size:.78rem;font-weight:800;
+  letter-spacing:.18em;text-transform:uppercase;margin-bottom:18px
+}
+h1{font-size:clamp(3.2rem,8vw,7.5rem);line-height:.92;letter-spacing:-.06em}
+h2{font-size:clamp(2rem,4.2vw,4.4rem);line-height:1;letter-spacing:-.04em;margin-bottom:30px}
+h3{font-size:1.25rem;margin-bottom:10px}
+p{color:var(--muted);font-size:1.02rem;line-height:1.65}
+.lead{font-size:clamp(1.05rem,1.7vw,1.35rem);max-width:720px}
+.accent{color:var(--accent)}
+.serif{font-family:'Playfair Display',serif;font-style:italic}
+.tag{
+  display:inline-block;border:1px solid #34343c;border-radius:999px;
+  padding:9px 15px;color:#ddd;font-size:.78rem;margin:5px
+}
+
+.hero-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:6vw;align-items:center}
+.hero-side{
+  border-left:1px solid #303038;padding-left:35px
+}
+.hero-side strong{display:block;color:#fff;font-size:2rem;margin-bottom:5px}
+.hero-side span{color:var(--muted);font-size:.85rem}
+.line{height:1px;background:#2d2d34;margin:28px 0}
+
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{
+  background:linear-gradient(145deg,#19191f,#111114);
+  border:1px solid #292930;border-radius:22px;padding:25px;
+  min-height:160px;transition:.25s
+}
+.card:hover{transform:translateY(-4px);border-color:#55555e}
+.icon{
+  width:42px;height:42px;border-radius:13px;background:var(--accent);
+  color:#111;display:flex;align-items:center;justify-content:center;
+  font-weight:900;margin-bottom:18px
+}
+.card p{font-size:.9rem}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.panel{
+  background:#131318;border:1px solid #292930;border-radius:24px;padding:28px
+}
+.list{display:grid;gap:13px;margin-top:18px}
+.list div{display:flex;gap:12px;align-items:flex-start;color:#ddd}
+.check{color:var(--accent);font-weight:800}
+
+.flow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:35px}
+.flow-item{
+  background:#18181e;border:1px solid #303039;border-radius:16px;
+  padding:18px 20px;text-align:center;min-width:145px
+}
+.arrow{color:var(--accent);font-size:1.5rem}
+
+.team{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+.person{
+  background:#16161b;border:1px solid #2b2b32;border-radius:22px;
+  padding:22px 16px;text-align:center
+}
+.avatar{
+  width:70px;height:70px;margin:0 auto 15px;border-radius:50%;
+  background:linear-gradient(135deg,#d7ff4f,#7d9630);
+  color:#0c0c0d;display:flex;align-items:center;justify-content:center;
+  font-size:1.35rem;font-weight:800
+}
+.person h3{font-size:1rem}
+.person small{color:var(--muted);font-size:.7rem}
+
+.timeline{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:25px}
+.step{border-top:3px solid var(--accent);padding:22px;background:#141419;border-radius:0 0 20px 20px}
+.step b{font-size:1.2rem}
+.step p{font-size:.88rem;margin-top:10px}
+
+.big-close{text-align:center}
+.big-close h2{font-size:clamp(2.8rem,6vw,6rem)}
+.big-close p{margin:0 auto 25px;max-width:650px}
+
+.nav{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  display:flex;align-items:center;gap:12px;z-index:20
+}
+.nav button{
+  border:1px solid #383840;background:#15151a;color:#fff;
+  width:44px;height:44px;border-radius:50%;cursor:pointer;font-size:1.1rem
+}
+.nav button:hover{background:#29292f}
+.dots{display:flex;gap:7px}
+.dot{width:7px;height:7px;background:#484850;border-radius:50%;cursor:pointer}
+.dot.active{background:var(--accent);width:22px;border-radius:10px}
+.counter{
+  position:fixed;top:25px;right:35px;color:#777;font-size:.75rem;
+  letter-spacing:.12em;z-index:20
+}
+.hint{
+  position:fixed;bottom:29px;left:35px;color:#666;font-size:.68rem;
+  letter-spacing:.08em;z-index:20
+}
+
+@media(max-width:800px){
+ .slide{padding:50px 7vw}
+ .hero-grid,.two-col{grid-template-columns:1fr}
+ .hero-side{display:none}
+ .cards{grid-template-columns:1fr}
+ .team{grid-template-columns:repeat(2,1fr)}
+ .timeline{grid-template-columns:1fr}
+ .content{max-height:84vh;overflow:auto;padding-bottom:25px}
+ .nav{bottom:12px}
+ .hint{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="presentation">
+
+<section class="slide active">
+ <div class="content hero-grid">
+  <div>
+   <div class="eyebrow">Proyecto Final · Laboratorio + Programación I</div>
+   <h1>INDUMENTARIA<br><span class="accent">PRO</span></h1>
+   <p class="lead" style="margin-top:25px">Sistema de gestión para un local de ropa: stock, ventas, usuarios, clientes y proveedores en un solo lugar.</p>
+   <div style="margin-top:25px">
+    <span class="tag">PSeInt</span><span class="tag">Lenguaje C</span><span class="tag">Gestión</span>
+   </div>
+  </div>
+  <div class="hero-side">
+   <strong>5 integrantes</strong><span>Un proyecto, una solución</span>
+   <div class="line"></div>
+   <strong>INSPT · UTN</strong><span>Presentación de defensa</span>
+  </div>
+ </div>
+</section>
+
+<section class="slide">
+ <div class="content">
+  <div class="eyebrow">01 · La idea</div>
+  <h2>¿Qué es <span class="accent">Indumentaria Pro</span>?</h2>
+  <p class="lead">Es un sistema pensado para controlar el funcionamiento de un local de ropa, haciendo foco en la organización del stock y las operaciones de venta.</p>
+  <div class="cards" style="margin-top:35px">
+   <div class="card"><div class="icon">01</div><h3>Stock</h3><p>Control de prendas y cantidades diferenciadas por talle.</p></div>
+   <div class="card"><div class="icon">02</div><h3>Ventas</h3><p>Registro de operaciones y actualización automática del stock.</p></div>
+   <div class="card"><div class="icon">03</div><h3>Gestión</h3><p>Organización de usuarios, clientes, repositores y proveedores.</p></div>
+  </div>
+ </div>
+</section>
+
+<section class="slide">
+ <div class="content">
+  <div class="eyebrow">02 · El problema</div>
+  <h2>¿Qué buscamos <span class="accent">resolver?</span></h2>
+  <div class="two-col">
+   <div class="panel">
+    <h3>Un local necesita saber qué tiene</h3>
+    <p>Una misma prenda puede existir en distintos talles. Por eso el sistema debe permitir conocer exactamente qué cantidad queda disponible.</p>
+    <div class="list">
+     <div><span class="check">✓</span><span>Evitar vender prendas sin stock.</span></div>
+     <div><span class="check">✓</span><span>Consultar cantidades rápidamente.</span></div>
+     <div><span class="check">✓</span><span>Detectar productos próximos a agotarse.</span></div>
+    </div>
+   </div>
+   <div class="panel">
+    <h3>También necesitamos organizar</h3>
+    <div class="list">
+     <div><span class="check">→</span><span>Clientes y sus datos.</span></div>
+     <div><span class="check">→</span><span>Administradores y repositores.</span></div>
+     <div><span class="check">→</span><span>Proveedores nacionales o extranjeros.</span></div>
+     <div><span class="check">→</span><span>Compras, ventas y facturación.</span></div>
+    </div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<section class="slide">
+ <div class="content">
+  <div class="eyebrow">03 · Objetivo</div>
+  <h2>Una gestión más <span class="accent">simple y ordenada.</span></h2>
+  <p class="lead">Desarrollar un sistema de gestión completo que permita aplicar algoritmia, estructuras de datos y modularización, con interacción mediante un menú.</p>
+  <div class="flow">
+   <div class="flow-item">👤 Usuarios</div><div class="arrow">→</div>
+   <div class="flow-item">👕 Productos</div><div class="arrow">→</div>
+   <div class="flow-item">📦 Stock</div><div class="arrow">→</div>
+   <div class="flow-item">💳 Venta</div><div class="arrow">→</div>
+   <div class="flow-item">💰 Caja</div>
+  </div>
+ </div>
+</section>
+
+<section class="slide">
+ <div class="content">
+  <div class="eyebrow">04 · Funcionalidades</div>
+  <h2>¿Qué puede hacer el <span class="accent">sistema?</span></h2>
+  <div class="cards">
+   <div class="card"><div class="icon">+</div><h3>Productos</h3><p>Agregar y consultar prendas, códigos, categorías y precios.</p></div>
+   <div class="card"><div class="icon">▦</div><h3>Stock por talle</h3><p>Registrar cantidades disponibles en S, M y L.</p></div>
+   <div class="card"><div class="icon">$</div><h3>Ventas</h3><p>Vender por código y talle, actualizar stock y registrar el importe.</p></div>
+   <div class="card"><div class="icon">%</div><h3>Medios de pago</h3><p>Contemplar diferentes formas de pago y descuento para efectivo.</p></div>
+   <div class="card"><div class="icon">!</div><h3>Alertas</h3><p>Detectar prendas con menos de 3 unidades en un talle.</p></div>
+   <div class="card"><div class="icon">↗</div><h3>Proveedores</h3><p>Consultar stock de mercadería y gestionar pedidos.</p></div>
+  </div>
+ </div>
+</section>
+
+<section class="slide">
+ <div class="content">
+  <div class="eyebrow">05 · Perfiles</div>
+  <h2>Distintos usuarios, <span class="accent">distintas funciones.</span></h2>
+  <div class="cards">
+   <div class="card"><div class="icon">ADM</div><h3>Administrador</h3><p>Gestiona usuarios y administra la información general del sistema.</p></div>
+   <div class="card"><div class="icon">CLI</div><h3>Cliente</h3><p>Cuenta con datos propios y puede realizar compras utilizando diferentes tipos de pago.</p></div>
+   <div class="card"><div class="icon">REP</div><h3>Repositor</h3><p>Trabaja con la información relacionada al stock y la reposición de mercadería.</p></div>
+  </div>
+  <div class="panel" style="margin-top:20px">
+   <h3>Proveedores</h3><p>Los proveedores pueden ser nacionales o extranjeros, especializarse en una o dos prendas y consultar el stock de su mercadería.</p>
+  </div>
+ </div>
+</section>
+
+<section class="slide">
+ <div class="content">
+  <div class="eyebrow">06 · Datos</div>
+  <h2>¿Cómo se <span class="accent">organiza</span> la información?</h2>
+  <div class="two-col">
+   <div class="panel">
+    <h3>Datos de la ropa</h3>
+    <div class="list">
+     <div><span class="check">•</span><span>Código</span></div>
+     <div><span class="check">•</span><span>Nombre</span></div>
+     <div><span class="check">•</span><span>Categoría</span></div>
+     <div><span class="check">•</span><span>Precio</span></div>
+    </div>
+   </div>
+   <div class="panel">
+    <h3>Stock</h3>
+    <div class="list">
+     <div><span class="check">•</span><span>Cantidad talle S</span></div>
+     <div><span class="check">•</span><span>Cantidad talle M</span></div>
+     <div><span class="check">•</span><span>Cantidad talle L</span></div>
+    </div>
+   </div>
+  </div>
+  <div class="panel" style="margin-top:20px">
+   <h3>Validaciones</h3><p>El sistema contempla controles para evitar códigos repetidos, precios negativos y ventas cuando no existe stock disponible.</p>
+  </div>
+ </div>
+</section>
+
+<section class="slide">
+ <div class="content">
+  <div class="eyebrow">07 · Tecnología</div>
+  <h2>Lo que aplicamos en <span class="accent">el proyecto.</span></h2>
+  <div class="cards">
+   <div class="card"><div class="icon">[ ]</div><h3>Arreglos y matrices</h3><p>Para almacenar y organizar la información del sistema.</p></div>
+   <div class="card"><div class="icon">↻</div><h3>Bucles</h3><p>Para recorrer datos y construir el menú interactivo.</p></div>
+   <div class="card"><div class="icon">?</div><h3>Condiciones</h3><p>Para validar situaciones y tomar decisiones dentro del sistema.</p></div>
+   <div class="card"><div class="icon">ƒ</div><h3>Funciones</h3><p>Para organizar el código y dividir responsabilidades.</p></div>
+   <div class="card"><div class="icon">C</div><h3>Programación I</h3><p>Estructuras, punteros y persistencia mediante archivos según la etapa.</p></div>
+   <div class="card"><div class="icon">PS</div><h3>Laboratorio</h3><p>Desarrollo del algoritmo en pseudocódigo con PSeInt.</p></div>
+  </div>
+ </div>
+</section>
+
+<section class="slide">
+ <div class="content">
+  <div class="eyebrow">08 · Equipo</div>
+  <h2>El equipo detrás de <span class="accent">Indumentaria Pro.</span></h2>
+  <div class="team">
+   <div class="person"><div class="avatar">DV</div><h3>Daiana Veliz</h3><small>Integrante</small></div>
+   <div class="person"><div class="avatar">ZA</div><h3>Zabala Abril</h3><small>Integrante</small></div>
+   <div class="person"><div class="avatar">PR</div><h3>Pablo Romero</h3><small>Integrante</small></div>
+   <div class="person"><div class="avatar">DC</div><h3>Danisa Chapi</h3><small>Integrante</small></div>
+   <div class="person"><div class="avatar">S</div><h3>Sabrina</h3><small>Integrante</small></div>
+  </div>
+  <p style="margin-top:25px">Proyecto realizado de manera colaborativa, siguiendo las etapas e hitos definidos para la entrega.</p>
+ </div>
+</section>
+
+<section class="slide">
+ <div class="content">
+  <div class="eyebrow">09 · Desarrollo</div>
+  <h2>Un proyecto que fue <span class="accent">creciendo por etapas.</span></h2>
+  <div class="timeline">
+   <div class="step"><b>HITO 1</b><p>Implementación base en memoria, estructuras lineales y/o matrices y CRUD funcionando.</p></div>
+   <div class="step"><b>HITO 2</b><p>Refactorización, estructuras, punteros y mejora de la modularización.</p></div>
+   <div class="step"><b>HITO 3</b><p>Persistencia en archivos, integración completa y validación final.</p></div>
+  </div>
+  <div class="panel" style="margin-top:22px">
+   <h3>Trabajo colaborativo</h3><p>El proyecto contempla el uso de herramientas de control de versiones y un repositorio con el desarrollo y documentación.</p>
+  </div>
+ </div>
+</section>
+
+<section class="slide">
+ <div class="content big-close">
+  <div class="eyebrow">10 · Cierre</div>
+  <h2>De una idea a una <span class="accent">solución.</span></h2>
+  <p>Indumentaria Pro busca integrar productos, stock, ventas, usuarios y proveedores dentro de un mismo sistema de gestión.</p>
+  <div style="margin-top:30px">
+   <span class="tag">DAIANA VELIZ</span>
+   <span class="tag">ZABALA ABRIL</span>
+   <span class="tag">PABLO ROMERO</span>
+   <span class="tag">DANISA CHAPI</span>
+   <span class="tag">SABRINA</span>
+  </div>
+  <h3 style="margin-top:35px;color:#fff">¿Preguntas?</h3>
+ </div>
+</section>
+
+</div>
+
+<div class="counter"><span id="current">01</span> / 10</div>
+<div class="hint">← → PARA NAVEGAR · ESPACIO AVANZA</div>
+<div class="nav">
+ <button id="prev" aria-label="Anterior">←</button>
+ <div class="dots" id="dots"></div>
+ <button id="next" aria-label="Siguiente">→</button>
+</div>
+
+<script>
+const slides=[...document.querySelectorAll('.slide')];
+const dots=document.getElementById('dots');
+const current=document.getElementById('current');
+let index=0;
+
+slides.forEach((_,i)=>{
+ const d=document.createElement('span');
+ d.className='dot'+(i===0?' active':'');
+ d.onclick=()=>go(i);
+ dots.appendChild(d);
+});
+
+function go(i){
+ index=(i+slides.length)%slides.length;
+ slides.forEach((s,n)=>s.classList.toggle('active',n===index));
+ document.querySelectorAll('.dot').forEach((d,n)=>d.classList.toggle('active',n===index));
+ current.textContent=String(index+1).padStart(2,'0');
+}
+function next(){go(index+1)}
+function prev(){go(index-1)}
+document.getElementById('next').onclick=next;
+document.getElementById('prev').onclick=prev;
+
+document.addEventListener('keydown',e=>{
+ if(['ArrowRight',' ','PageDown'].includes(e.key)){e.preventDefault();next()}
+ if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();prev()}
+ if(e.key==='Home')go(0);
+ if(e.key==='End')go(slides.length-1);
+});
+</script>
+</body>
+</html>
