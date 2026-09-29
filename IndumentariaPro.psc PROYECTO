@@ -1,0 +1,557 @@
+// ============================================================================
+// PROYECTO: SISTEMA INTEGRAL "INDUMENTARIA PRO"
+// MATERIA: Laboratorio
+// LENGUAJE: PSeInt (Pseudocódigo)
+// 
+// DESCRIPCIÓN:
+// Sistema de gestión comercial que administra diferentes perfiles de usuario,
+// stock segmentado por talle (S, M, L), relación con proveedores,
+// registro de ventas, emisión de facturas (A, B, C) y cierre diario (Caja Z).
+// ============================================================================
+
+
+// ============================================================================
+// SUBPROCESO: CargarDatosIniciales
+// Objetivo: Precargar información simulada para probar el programa sin tener
+//           que escribir todo manualmente desde cero cada vez que se ejecuta.
+// ============================================================================
+SubProceso CargarDatosIniciales(MatrizUsuarios Por Referencia, VectorRol Por Referencia, cantUsuarios Por Referencia, MatrizProveedores Por Referencia, cantProv Por Referencia, MatrizPrendas Por Referencia, MatrizStock Por Referencia, VectorProvPrenda Por Referencia, cantPrendas Por Referencia)
+	
+	// ------------------------------------------------------------------------
+	// 1. Carga de Usuarios Base
+	// Estructura MatrizUsuarios: [Fila, Columna] -> 1:ID, 2:DNI, 3:Nombre, 4:Apellido, 5:Tel, 6:Dir
+	// VectorRol: 1:Administrador, 2:Repositor, 3:Proveedor, 4:Cliente
+	// ------------------------------------------------------------------------
+	
+	// Usuario 1: Administrador del sistema
+	MatrizUsuarios[1,1] <- "1"              // ID de usuario
+	MatrizUsuarios[1,2] <- "11111111"       // DNI
+	MatrizUsuarios[1,3] <- "Carlos"         // Nombre
+	MatrizUsuarios[1,4] <- "Gomez"          // Apellido
+	MatrizUsuarios[1,5] <- "1144445555"     // Teléfono
+	MatrizUsuarios[1,6] <- "Av. Corrientes 100" // Dirección
+	VectorRol[1] <- 1                        // Rol: Administrador
+	
+	// Usuario 2: Repositor de stock
+	MatrizUsuarios[2,1] <- "2"
+	MatrizUsuarios[2,2] <- "22222222"
+	MatrizUsuarios[2,3] <- "Laura"
+	MatrizUsuarios[2,4] <- "Perez"
+	MatrizUsuarios[2,5] <- "1166667777"
+	MatrizUsuarios[2,6] <- "Calle Falsa 123"
+	VectorRol[2] <- 2                        // Rol: Repositor
+	
+	// Usuario 3: Perfil Proveedor
+	MatrizUsuarios[3,1] <- "3"
+	MatrizUsuarios[3,2] <- "33333333"
+	MatrizUsuarios[3,3] <- "Textil"
+	MatrizUsuarios[3,4] <- "Sur"
+	MatrizUsuarios[3,5] <- "1188889999"
+	MatrizUsuarios[3,6] <- "Ruta 8 Km 40"
+	VectorRol[3] <- 3                        // Rol: Proveedor
+	
+	// Usuario 4: Cliente habitual
+	MatrizUsuarios[4,1] <- "4"
+	MatrizUsuarios[4,2] <- "44444444"
+	MatrizUsuarios[4,3] <- "Maria"
+	MatrizUsuarios[4,4] <- "Lopez"
+	MatrizUsuarios[4,5] <- "1122223333"
+	MatrizUsuarios[4,6] <- "San Martin 450"
+	VectorRol[4] <- 4                        // Rol: Cliente
+	
+	cantUsuarios <- 4 // Contador de usuarios cargados
+	
+	// ------------------------------------------------------------------------
+	// 2. Carga de Proveedores
+	// Estructura MatrizProveedores: 1:ID_Prov, 2:Razón Social, 3:Origen, 4:Especialidad
+	// ------------------------------------------------------------------------
+	MatrizProveedores[1,1] <- "101"              // ID propio del proveedor
+	MatrizProveedores[1,2] <- "Textil Sur SRL"   // Razón Social
+	MatrizProveedores[1,3] <- "Nacional"         // Origen (Nacional / Extranjero)
+	MatrizProveedores[1,4] <- "Remeras y Jeans"  // Especialidad (1 o 2 prendas)
+	cantProv <- 1                                // Contador de proveedores cargados
+	
+	// ------------------------------------------------------------------------
+	// 3. Carga de Prendas y Stock Inicial
+	// MatrizPrendas: 1:Código, 2:Nombre, 3:Categoría
+	// MatrizStock:   1:Precio, 2:Stock S, 3:Stock M, 4:Stock L
+	// VectorProvPrenda: Guarda el ID del proveedor asignado a esta prenda
+	// ------------------------------------------------------------------------
+	MatrizPrendas[1,1] <- "RE01"                  // Código de producto
+	MatrizPrendas[1,2] <- "Remera Oversize"       // Descripción
+	MatrizPrendas[1,3] <- "Remeras"               // Categoría del producto
+	
+	MatrizStock[1,1] <- 15000                      // Precio de venta en pesos
+	MatrizStock[1,2] <- 2                          // Cantidad en Talle S (Bajo stock para testear alerta)
+	MatrizStock[1,3] <- 5                          // Cantidad en Talle M
+	MatrizStock[1,4] <- 10                         // Cantidad en Talle L
+	VectorProvPrenda[1] <- 101                    // Enlazado con el Proveedor ID 101
+	cantPrendas <- 1                               // Contador de prendas cargadas
+	
+FinSubProceso
+
+
+// ============================================================================
+// SUBPROCESOS DE GESTIÓN DE USUARIOS Y PROVEEDORES
+// ============================================================================
+
+// RegistrarUsuario: Permite al Administrador dar de alta una nueva persona en el sistema.
+SubProceso RegistrarUsuario(MatrizUsuarios Por Referencia, VectorRol Por Referencia, cantUsuarios Por Referencia)
+	Definir rolElegido Como Entero
+	
+	// Controlamos no superar la capacidad máxima de la matriz (100 filas)
+	Si cantUsuarios < 100 Entonces
+		cantUsuarios <- cantUsuarios + 1 // Incrementamos el contador
+		Limpiar Pantalla
+		Escribir "=== ALTA DE NUEVO USUARIO ==="
+		
+		// Asignamos el ID de forma automática convirtiendo el contador a texto
+		MatrizUsuarios[cantUsuarios, 1] <- ConvertirATexto(cantUsuarios)
+		Escribir "ID Asignado por el sistema: ", MatrizUsuarios[cantUsuarios, 1]
+		
+		// Lectura de datos personales
+		Escribir "Ingrese DNI: "; Leer MatrizUsuarios[cantUsuarios, 2]
+		Escribir "Ingrese Nombre: "; Leer MatrizUsuarios[cantUsuarios, 3]
+		Escribir "Ingrese Apellido: "; Leer MatrizUsuarios[cantUsuarios, 4]
+		Escribir "Ingrese Teléfono: "; Leer MatrizUsuarios[cantUsuarios, 5]
+		Escribir "Ingrese Dirección: "; Leer MatrizUsuarios[cantUsuarios, 6]
+		
+		// Selección y validación del perfil del usuario
+		Escribir "Seleccione el Rol (1: Admin, 2: Repositor, 3: Proveedor, 4: Cliente): "
+		Leer rolElegido
+		
+		// Validamos mediante un bucle Mientras que el rol sea un número del 1 al 4
+		Mientras rolElegido < 1 O rolElegido > 4 Hacer
+			Escribir "Opción de rol no válida. Ingrese entre 1 y 4: "
+			Leer rolElegido
+		FinMientras
+		
+		VectorRol[cantUsuarios] <- rolElegido // Guardamos el rol en el arreglo paralelo
+		Escribir "-----------------------------------------"
+		Escribir "¡Usuario registrado exitosamente!"
+	Sino
+		Escribir "Error: Se alcanzó el límite máximo de usuarios (100)."
+	FinSi
+	Esperar Tecla // Pausa hasta que el usuario presione una tecla
+FinSubProceso
+
+// ListarUsuarios: Muestra en pantalla todos los usuarios registrados con su perfil.
+SubProceso ListarUsuarios(MatrizUsuarios Por Referencia, VectorRol Por Referencia, cantUsuarios)
+	Definir i Como Entero
+	Limpiar Pantalla
+	Escribir "========================================================="
+	Escribir "                   LISTADO DE USUARIOS                   "
+	Escribir "========================================================="
+	Escribir "ID | DNI      | Nombre y Apellido     | Rol"
+	Escribir "---------------------------------------------------------"
+	
+	// Recorremos la matriz hasta la cantidad actual de usuarios cargados
+	Para i <- 1 Hasta cantUsuarios Hacer
+		Escribir MatrizUsuarios[i,1], "  | ", MatrizUsuarios[i,2], " | ", MatrizUsuarios[i,3], " ", MatrizUsuarios[i,4], " | " Sin Saltar
+		
+		// Traducimos el número de rol guardado en VectorRol a su equivalente en texto
+		Segun VectorRol[i] Hacer
+			1: Escribir "Administrador"
+			2: Escribir "Repositor"
+			3: Escribir "Proveedor"
+			4: Escribir "Cliente"
+		FinSegun
+	FinPara
+	
+	Escribir "---------------------------------------------------------"
+	Esperar Tecla
+FinSubProceso
+
+// RegistrarProveedor: Permite cargar un proveedor indicando si es nacional o extranjero.
+SubProceso RegistrarProveedor(MatrizProveedores Por Referencia, cantProv Por Referencia)
+	Definir origenOpc Como Entero
+	
+	Si cantProv < 50 Entonces
+		cantProv <- cantProv + 1
+		Limpiar Pantalla
+		Escribir "=== ALTA DE PROVEEDOR ==="
+		Escribir "Ingrese ID del Proveedor (ej: 102): "; Leer MatrizProveedores[cantProv, 1]
+		Escribir "Ingrese Nombre / Razón Social: "; Leer MatrizProveedores[cantProv, 2]
+		
+		// Selección de origen
+		Escribir "Origen del Proveedor (1: Nacional, 2: Extranjero): "; Leer origenOpc
+		Si origenOpc == 1 Entonces
+			MatrizProveedores[cantProv, 3] <- "Nacional"
+		Sino
+			MatrizProveedores[cantProv, 3] <- "Extranjero"
+		FinSi
+		
+		Escribir "Especialidad (1 o 2 tipos de prendas, ej: Camperas/Pantalones): "
+		Leer MatrizProveedores[cantProv, 4]
+		
+		Escribir "-----------------------------------------"
+		Escribir "¡Proveedor registrado con éxito!"
+	Sino
+		Escribir "Error: Base de datos de proveedores llena."
+	FinSi
+	Esperar Tecla
+FinSubProceso
+
+
+// ============================================================================
+// SUBPROCESOS DE INVENTARIO Y CONTROL DE STOCK
+// ============================================================================
+
+// RegistrarPrenda: Da de alta un nuevo producto ingresando sus cantidades iniciales por talle.
+SubProceso RegistrarPrenda(MatrizPrendas Por Referencia, MatrizStock Por Referencia, VectorProvPrenda Por Referencia, cantPrendas Por Referencia)
+	Si cantPrendas < 100 Entonces
+		cantPrendas <- cantPrendas + 1
+		Limpiar Pantalla
+		Escribir "=== CARGA DE NUEVA PRENDA ==="
+		Escribir "Código de Prenda (ej: RE02): "; Leer MatrizPrendas[cantPrendas, 1]
+		Escribir "Nombre / Descripción: "; Leer MatrizPrendas[cantPrendas, 2]
+		Escribir "Categoría: "; Leer MatrizPrendas[cantPrendas, 3]
+		
+		// Validación: El precio no puede ser negativo ni cero
+		Escribir "Precio de Venta ($): "; Leer MatrizStock[cantPrendas, 1]
+		Mientras MatrizStock[cantPrendas, 1] <= 0 Hacer
+			Escribir "El precio debe ser un monto positivo. Reingrese: "
+			Leer MatrizStock[cantPrendas, 1]
+		FinMientras
+		
+		// Carga de inventario distribuido por talle
+		Escribir "Cantidad Inicial Talle S: "; Leer MatrizStock[cantPrendas, 2]
+		Escribir "Cantidad Inicial Talle M: "; Leer MatrizStock[cantPrendas, 3]
+		Escribir "Cantidad Inicial Talle L: "; Leer MatrizStock[cantPrendas, 4]
+		
+		// Asignación con el proveedor
+		Escribir "ID del Proveedor asignado a este producto: "; Leer VectorProvPrenda[cantPrendas]
+		
+		Escribir "-----------------------------------------"
+		Escribir "¡Prenda registrada en el catálogo!"
+	Sino
+		Escribir "Error: Capacidad máxima de productos alcanzada."
+	FinSi
+	Esperar Tecla
+FinSubProceso
+
+// MostrarStock: Imprime la lista completa de productos disponibles y el stock por talle.
+SubProceso MostrarStock(MatrizPrendas Por Referencia, MatrizStock Por Referencia, cantPrendas)
+	Definir i Como Entero
+	Limpiar Pantalla
+	Escribir "========================================================="
+	Escribir "                 CATÁLOGO Y STOCK ACTUAL                 "
+	Escribir "========================================================="
+	Escribir "COD   | NOMBRE            | PRECIO  | TALLE S | TALLE M | TALLE L"
+	Escribir "---------------------------------------------------------"
+	
+	Para i <- 1 Hasta cantPrendas Hacer
+		Escribir MatrizPrendas[i,1], " | ", MatrizPrendas[i,2], " | $", MatrizStock[i,1], " | ", MatrizStock[i,2], " u.    | ", MatrizStock[i,3], " u.    | ", MatrizStock[i,4], " u."
+			Escribir "---------------------------------------------------------"
+			Esperar Tecla
+		FinPara
+		
+FinSubProceso
+
+// AlertaStockCritico: Requisito especial. Filtra y muestra solo los productos con menos de 3 unidades en algún talle.
+SubProceso AlertaStockCritico(MatrizPrendas Por Referencia, MatrizStock Por Referencia, cantPrendas)
+	Definir i Como Entero
+	Definir hayAlerta Como Logico
+	hayAlerta <- Falso
+	
+	Limpiar Pantalla
+	Escribir "========================================================="
+	Escribir "        ALERTAS DE REPOSICIÓN (MENOS DE 3 UNIDADES)      "
+	Escribir "========================================================="
+	
+	Para i <- 1 Hasta cantPrendas Hacer
+		// Si en el talle S, M o L quedan menos de 3 unidades, se activa la alerta
+		Si MatrizStock[i,2] < 3 O MatrizStock[i,3] < 3 O MatrizStock[i,4] < 3 Entonces
+			Escribir "¡ALERTA! Prenda: ", MatrizPrendas[i,2], " (Cod: ", MatrizPrendas[i,1], ")"
+			Escribir "-> Quedan -> Talle S: ", MatrizStock[i,2], " | Talle M: ", MatrizStock[i,3], " | Talle L: ", MatrizStock[i,4]
+			Escribir "---------------------------------------------------------"
+			hayAlerta <- Verdadero
+		FinSi
+	FinPara
+	
+	Si No hayAlerta Entonces
+		Escribir "Excelente: Todo el stock supera las 3 unidades de reposición."
+	FinSi
+	Esperar Tecla
+FinSubProceso
+
+
+// ============================================================================
+// SUBPROCESOS DE VENTAS, FACTURACIÓN Y CAJA Z
+// ============================================================================
+
+// EmitirFactura: Formatea e imprime en pantalla el comprobante de venta fiscal (Factura A, B o C).
+SubProceso EmitirFactura(tipoFactura, clienteNombre, producto, talle, cant, montoTotal, medioPago)
+	Limpiar Pantalla
+	Escribir "========================================="
+	Escribir "             FACTURA TIPO ", tipoFactura
+	Escribir "========================================="
+	Escribir "Cliente: ", clienteNombre
+	Escribir "Detalle: ", cant, " x ", producto, " (Talle ", talle, ")"
+	Escribir "Medio de Pago: ", medioPago
+	Escribir "-----------------------------------------"
+	Escribir "TOTAL FINAL A PAGAR: $", montoTotal
+	Escribir "========================================="
+FinSubProceso
+
+// RealizarVenta: Procesa la compra de un cliente, aplica descuentos, actualiza stock y suma a la caja diaria.
+SubProceso RealizarVenta(MatrizPrendas Por Referencia, MatrizStock Por Referencia, cantPrendas, cajaTotal Por Referencia, cajaEfectivo Por Referencia, cajaTarjeta Por Referencia, totalFacturas Por Referencia)
+	Definir codBuscado, talleBuscado, clienteNombre, tipoFac, medioPagoStr Como Cadena
+	Definir i, pos, cantComprar, medioPago, talleCol Como Entero
+	Definir subtotal, totalFinal Como Real
+	Definir encontrado Como Logico
+	
+	Limpiar Pantalla
+	Escribir "=== MÓDULO DE ATENCIÓN Y VENTAS ==="
+	Escribir "Ingrese el Código del Producto a vender (ej: RE01): "; Leer codBuscado
+	
+	// Buscamos si el código existe en la matriz
+	encontrado <- Falso
+	Para i <- 1 Hasta cantPrendas Hacer
+		Si MatrizPrendas[i,1] == codBuscado Entonces
+			encontrado <- Verdadero
+			pos <- i // Guardamos la fila donde se encontró
+		FinSi
+	FinPara
+	
+	Si encontrado Entonces
+		Escribir "Producto seleccionado: ", MatrizPrendas[pos,2]
+		Escribir "Ingrese Talle deseado (S, M, L): "; Leer talleBuscado
+		talleBuscado <- Mayusculas(talleBuscado) // Pasamos a mayúscula para evitar errores
+		
+		// Mapeamos el texto del talle a la columna de la MatrizStock
+		Segun talleBuscado Hacer
+			"S": talleCol <- 2
+			"M": talleCol <- 3
+			"L": talleCol <- 4
+			De Otro Modo: talleCol <- 0
+		FinSegun
+		
+		Si talleCol > 0 Entonces
+			Escribir "Unidades disponibles en talle ", talleBuscado, ": ", MatrizStock[pos, talleCol]
+			Escribir "Ingrese Cantidad a comprar: "; Leer cantComprar
+			
+			// Validamos que haya stock suficiente para efectuar la venta
+			Si cantComprar <= MatrizStock[pos, talleCol] Y cantComprar > 0 Entonces
+				subtotal <- MatrizStock[pos, 1] * cantComprar
+				
+				Escribir "Ingrese Nombre del Cliente: "; Leer clienteNombre
+				Escribir "Seleccione Tipo de Factura (A, B, C): "; Leer tipoFac
+				Escribir "Forma de Pago (1: Efectivo -10% Descuento, 2: Tarjeta / Transferencia): "
+				Leer medioPago
+				
+				// Aplicación de regla de negocio: 10% de descuento en efectivo
+				Si medioPago == 1 Entonces
+					totalFinal <- subtotal * 0.90
+					medioPagoStr <- "Efectivo (10% Descuento Aplicado)"
+					cajaEfectivo <- cajaEfectivo + totalFinal
+				Sino
+					totalFinal <- subtotal
+					medioPagoStr <- "Tarjeta / Transferencia Bancaria"
+					cajaTarjeta <- cajaTarjeta + totalFinal
+				FinSi
+				
+				// Actualización de variables de estado
+				MatrizStock[pos, talleCol] <- MatrizStock[pos, talleCol] - cantComprar // Restamos stock
+				cajaTotal <- cajaTotal + totalFinal                                     // Sumamos al total diario
+				totalFacturas <- totalFacturas + 1                                       // Incrementamos contador de comprobantes
+				
+				// Emitimos el comprobante por pantalla
+				EmitirFactura(Mayusculas(tipoFac), clienteNombre, MatrizPrendas[pos,2], talleBuscado, cantComprar, totalFinal, medioPagoStr)
+			Sino
+				Escribir "Error: Stock insuficiente en ese talle o cantidad ingresada no válida."
+			FinSi
+		Sino
+			Escribir "Error: Talle ingresado incorrecto."
+		FinSi
+	Sino
+		Escribir "Error: El código de producto ingresado no existe."
+	FinSi
+	Esperar Tecla
+FinSubProceso
+
+// CierreCajaZ: Requisito pedido por el profesor. Muestra el resumen del día y resetea las métricas a cero.
+SubProceso CierreCajaZ(cajaTotal Por Referencia, cajaEfectivo Por Referencia, cajaTarjeta Por Referencia, totalFacturas Por Referencia)
+	Limpiar Pantalla
+	Escribir "========================================="
+	Escribir "       INFORME DE CIERRE DE CAJA Z       "
+	Escribir "========================================="
+	Escribir "Cantidad de Facturas Emitidas: ", totalFacturas
+	Escribir "Total Recaudado en Efectivo: $", cajaEfectivo
+	Escribir "Total Recaudado en Tarjeta/Transf: $", cajaTarjeta
+	Escribir "-----------------------------------------"
+	Escribir "RECAUDACIÓN TOTAL DEL DÍA: $", cajaTotal
+	Escribir "========================================="
+	Escribir "Informe generado. La caja diaria ha sido reiniciada a $0."
+	
+	// Puesta a cero de la caja para la siguiente jornada
+	cajaTotal <- 0;
+	cajaEfectivo <- 0;
+	cajaTarjeta <- 0;
+	totalFacturas <- 0;
+	Esperar Tecla
+FinSubProceso
+
+
+// ============================================================================
+// SUBPROCESOS DE MENÚS POR ROL DE USUARIO
+// ============================================================================
+
+// MenuAdmin: Opciones exclusivas para el Administrador
+SubProceso MenuAdmin(MatrizUsuarios Por Referencia, VectorRol Por Referencia, cantUsuarios Por Referencia, MatrizProveedores Por Referencia, cantProv Por Referencia, MatrizPrendas Por Referencia, MatrizStock Por Referencia, VectorProvPrenda Por Referencia, cantPrendas Por Referencia, cajaTotal Por Referencia, cajaEfectivo Por Referencia, cajaTarjeta Por Referencia, totalFacturas Por Referencia)
+	Definir opc Como Entero
+	opc <- 0
+	Mientras opc <> 6 Hacer
+		Limpiar Pantalla
+		Escribir "=== PANEL ADMINISTRATIVO ==="
+		Escribir "1. Registrar Nuevo Usuario (Admin, Repositor, Proveedor, Cliente)"
+		Escribir "2. Listar Todos los Usuarios"
+		Escribir "3. Registrar Nuevo Proveedor"
+		Escribir "4. Cargar Nueva Prenda al Inventario"
+		Escribir "5. Realizar Cierre de Caja Z"
+		Escribir "6. Volver al Menú Principal"
+		Escribir "Seleccione una opción: "
+		Leer opc
+		
+		Segun opc Hacer
+			1: RegistrarUsuario(MatrizUsuarios, VectorRol, cantUsuarios)
+			2: ListarUsuarios(MatrizUsuarios, VectorRol, cantUsuarios)
+			3: RegistrarProveedor(MatrizProveedores, cantProv)
+			4: RegistrarPrenda(MatrizPrendas, MatrizStock, VectorProvPrenda, cantPrendas)
+			5: CierreCajaZ(cajaTotal, cajaEfectivo, cajaTarjeta, totalFacturas)
+			6: Escribir "Regresando al menú principal..."
+		FinSegun
+	FinMientras
+FinSubProceso
+
+// MenuRepositor: Opciones exclusivas para el Repositor de mercadería
+SubProceso MenuRepositor(MatrizPrendas Por Referencia, MatrizStock Por Referencia, cantPrendas)
+	Definir opc Como Entero
+	opc <- 0
+	Mientras opc <> 3 Hacer
+		Limpiar Pantalla
+		Escribir "=== PANEL DE REPOSITOR ==="
+		Escribir "1. Ver Stock General por Talle"
+		Escribir "2. Ver Alertas de Stock Crítico (< 3 unidades)"
+		Escribir "3. Volver al Menú Principal"
+		Escribir "Seleccione una opción: "; Leer opc
+		
+		Segun opc Hacer
+			1: MostrarStock(MatrizPrendas, MatrizStock, cantPrendas)
+			2: AlertaStockCritico(MatrizPrendas, MatrizStock, cantPrendas)
+			3: Escribir "Regresando al menú principal..."
+		FinSegun
+	FinMientras
+FinSubProceso
+
+// MenuProveedor: Opciones para que el Proveedor controle sus productos en nuestro local
+SubProceso MenuProveedor(MatrizPrendas Por Referencia, MatrizStock Por Referencia, VectorProvPrenda Por Referencia, cantPrendas)
+	Definir idProvBuscado, i Como Entero
+	Definir encontrado Como Logico
+	encontrado <- Falso
+	
+	Limpiar Pantalla
+	Escribir "=== PANEL DE ACCESO A PROVEEDORES ==="
+	Escribir "Ingrese su ID de Proveedor para consultar su mercadería (ej: 101): "; Leer idProvBuscado
+	
+	Escribir "---------------------------------------------------------"
+	Escribir "MERCADERÍA SUMINISTRADA EN NUESTRO LOCAL:"
+	
+	// Filtra e imprime únicamente los productos que pertenezcan a ese ID de proveedor
+	Para i <- 1 Hasta cantPrendas Hacer
+		Si VectorProvPrenda[i] == idProvBuscado Entonces
+			encontrado <- Verdadero
+			Escribir "Producto: ", MatrizPrendas[i,2], " | Stock -> S: ", MatrizStock[i,2], " u. | M: ", MatrizStock[i,3], " u. | L: ", MatrizStock[i,4], " u."
+		FinSi
+	FinPara
+	
+	Si No encontrado Entonces
+		Escribir "No existen prendas registradas en el sistema vinculadas a su ID de Proveedor."
+	FinSi
+	Escribir "---------------------------------------------------------"
+	Esperar Tecla
+FinSubProceso
+
+// MenuCliente: Módulo de ventas y consulta de catálogo
+SubProceso MenuCliente(MatrizPrendas Por Referencia, MatrizStock Por Referencia, cantPrendas, cajaTotal Por Referencia, cajaEfectivo Por Referencia, cajaTarjeta Por Referencia, totalFacturas Por Referencia)
+	Definir opc Como Entero
+	opc <- 0
+	Mientras opc <> 3 Hacer
+		Limpiar Pantalla
+		Escribir "=== PANEL DE CLIENTE / ATENCIÓN PÚBLICA ==="
+		Escribir "1. Ver Catálogo de Productos y Precios"
+		Escribir "2. Comprar Producto (Atención al Cliente)"
+		Escribir "3. Volver al Menú Principal"
+		Escribir "Seleccione una opción: "; Leer opc
+		
+		Segun opc Hacer
+			1: MostrarStock(MatrizPrendas; MatrizStock;cantPrendas)
+			2: RealizarVenta(MatrizPrendas, MatrizStock, cantPrendas, cajaTotal, cajaEfectivo,:cajaTarjeta; totalFacturas)
+			3: Escribir "Regresando al menú principal..."
+		FinSegun
+	FinMientras
+FinSubProceso
+
+
+// ============================================================================
+// ALGORITMO PRINCIPAL (PUNTO DE ENTRADA AL PROGRAMA)
+// ============================================================================
+Algoritmo IndumentariaPro
+	
+	// 1. Declaración e Inicialización de Arreglos y Matrices Multidimensionales
+	Dimension MatrizUsuarios[100, 6]      // Guarda [ID, DNI, Nombre, Apellido, Teléfono, Dirección]
+	Dimension VectorRol[100]              // Guarda el rol (1:Admin, 2:Repositor, 3:Proveedor, 4:Cliente)
+	Dimension MatrizProveedores[50, 4]    // Guarda [ID_Prov, Razón Social, Origen, Especialidad]
+	Dimension MatrizPrendas[100, 3]       // Guarda [Código, Nombre, Categoría]
+	Dimension MatrizStock[100, 4]         // Guarda [Precio, Stock S, Stock M, Stock L]
+	Dimension VectorProvPrenda[100]       // Relación: Guarda el ID de proveedor por cada producto
+	
+	// 2. Definición de Variables Contador de Registros
+	Definir cantUsuarios, cantProv, cantPrendas Como Entero
+	cantUsuarios <- 0
+	cantProv <- 0
+	cantPrendas <- 0
+	
+	// 3. Definición de Variables de Control Financiero y Caja Z
+	Definir cajaTotal, cajaEfectivo, cajaTarjeta Como Real
+	Definir totalFacturas Como Entero
+	cajaTotal <- 0
+	cajaEfectivo <- 0
+	cajaTarjeta <- 0
+	totalFacturas <- 0
+	
+	// 4. Ejecución de Carga de Datos Iniciales para Testeo
+	CargarDatosIniciales(MatrizUsuarios, VectorRol, cantUsuarios, MatrizProveedores, cantProv, MatrizPrendas, MatrizStock, VectorProvPrenda, cantPrendas)
+	
+	// 5. Bucle Interactivo del Menú Principal
+	Definir opciones Como Entero
+	opciones <- 0
+	
+	Mientras opciones <> 5 Hacer
+		Limpiar Pantalla
+		Escribir "========================================="
+		Escribir "    SISTEMA INDUMENTARIA PRO - PSEINT    "
+		Escribir "========================================="
+		Escribir "1. Menú Administrador"
+		Escribir "2. Menú Repositor"
+		Escribir "3. Menú Proveedor"
+		Escribir "4. Menú Cliente / Ventas"
+		Escribir "5. Salir del Sistema"
+		Escribir "========================================="
+		Escribir "Seleccione una opción: "
+		Leer opciones
+		
+		// Derivación a cada subproceso según el menú seleccionado
+		Segun opciones Hacer
+			1: MenuAdmin(MatrizUsuarios, VectorRol, cantUsuarios, MatrizProveedores, cantProv, MatrizPrendas, MatrizStock, VectorProvPrenda, cantPrendas, cajaTotal, cajaEfectivo, cajaTarjeta, totalFacturas)
+			2: MenuRepositor(MatrizPrendas, MatrizStock, cantPrendas)
+			3: MenuProveedor(MatrizPrendas, MatrizStock, VectorProvPrenda, cantPrendas)
+			4: MenuCliente(MatrizPrendas, MatrizStock, cantPrendas, cajaTotal, cajaEfectivo, cajaTarjeta, totalFacturas)
+			5: Escribir "Gracias por utilizar Indumentaria Pro. ¡Hasta luego!"
+			De Otro Modo:
+				Escribir "Opción no válida. Presione enter para continuar."
+				Esperar Tecla
+		FinSegun
+	FinMientras
+
+FinAlgoritmo
